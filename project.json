@@ -1,0 +1,12 @@
+{
+    "name": "UnityFoundation.Grid",
+    "version": "0.0.1",
+    "package_file": "Assets/UnityFoundation.Grid/package.json",
+    "unity_package": {
+        "name": "unityfoundation-grid",
+        "path": "Builds",
+        "export_folders": [
+            "Assets/UnityFoundation.Grid"
+        ]
+    }
+}

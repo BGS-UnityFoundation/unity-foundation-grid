@@ -1,0 +1,26 @@
+{
+    "name": "UnityFoundation.Grid.Tests",
+    "rootNamespace": "UnityFoundation.Grid.Tests",
+    "references": [
+        
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [
+        
+    ],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        
+    ],
+    "versionDefines": [
+        
+    ],
+    "noEngineReferences": false
+}
