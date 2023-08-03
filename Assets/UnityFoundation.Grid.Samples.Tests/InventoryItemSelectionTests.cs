@@ -20,14 +20,14 @@ namespace UnityFoundation.Grid.Samples.Tests
             var item = new InventoryItem();
             var selectedCoord = new XY(0, 0);
 
-            var changedEvent = new EventTest<Optional<SelectedValue<XY, InventoryItem>>>(
+            var changedEvent = new EventTest<Optional<InventoryItemSelected>>(
                 selection, nameof(selection.OnValueChanged)
             );
 
             selection.Set(selectedCoord, item);
 
             Assert.That(selection.Current.IsPresent, Is.True);
-            Assert.That(selection.Current.Get().Key, Is.EqualTo(selectedCoord));
+            Assert.That(selection.Current.Get().Coord, Is.EqualTo(selectedCoord));
             Assert.That(selection.Current.Get().Value, Is.EqualTo(item));
             Assert.That(changedEvent.WasTriggered, Is.True);
         }

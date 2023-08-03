@@ -12,22 +12,48 @@ namespace UnityFoundation.Grid.Samples
         [SerializeField] InventoryView inventoryView;
         [SerializeField] RectTransform debugPanel;
 
-        XYSelection cursorPosition;
-        InventoryItemSelection itemSelection;
-
-        KeyboardInputs inputs;
-
-        private GridLimitXY limits;
-        private GridXY<InventoryItem> grid;
+        private IDependencyContainer container;
 
         public void Start()
         {
-            inputs = new KeyboardInputs();
-            itemSelection = new InventoryItemSelection();
-            cursorPosition = new XYSelection();
+            var binder = new DependencyBinder();
+            binder.RegisterSingleton<KeyboardInputs, KeyboardInputs>();
+            binder.RegisterSingleton<InventoryItemSelection, InventoryItemSelection>();
+            binder.RegisterSingleton<InventoryCursorSelection, InventoryCursorSelection>();
+            binder.Register(new GridLimitXY(width, height));
+            binder.RegisterSingleton<InventoryGrid, InventoryGrid>();
+            binder.RegisterSetup(selectionView);
+            binder.RegisterSetup(inventoryView);
 
-            this.limits = new GridLimitXY(width, height);
-            this.grid = new GridXY<InventoryItem>(limits);
+            binder.Register<InventoryCommands>();
+            binder.Register<MoveCursorCommand>();
+            binder.Register<SelectedItemCommand>();
+
+            binder.Register<GridXYDebugView>();
+
+            container = binder.Build();
+
+            FillInventoryGrid();
+            container.Resolve<InventoryCursorSelection>().Set(new(0, 0));
+
+            var commands = container.Resolve<InventoryCommands>();
+            commands.Register(container.Resolve<MoveCursorCommand>());
+            commands.Register(container.Resolve<SelectedItemCommand>());
+
+            var updateProcessor = UpdateProcessor.Create();
+            updateProcessor.Register(container.Resolve<KeyboardInputs>());
+            updateProcessor.Register(commands);
+
+            container.Resolve<InventoryView>().Display();
+            container.Resolve<InventoryItemSelectionView>().Display();
+
+            container.Resolve<GridXYDebugView>().Display(debugPanel);
+        }
+
+        private void FillInventoryGrid()
+        {
+            var limits = container.Resolve<GridLimitXY>();
+            var grid = container.Resolve<InventoryGrid>();
 
             var index = 0;
             foreach(var coord in limits.GetAllCoordinates())
@@ -38,43 +64,6 @@ namespace UnityFoundation.Grid.Samples
                         Name = $"Item {index++}"
                     }
                 );
-            }
-            var initialCoord = new XY(0, 0);
-            cursorPosition.Set(initialCoord);
-
-            selectionView.Setup(itemSelection);
-            inventoryView.Setup(grid, limits, cursorPosition, itemSelection);
-            new GridXYDebugView().Display(grid, limits, debugPanel);
-        }
-
-        public void Update()
-        {
-            inputs.Update();
-
-            var baseCoord = new XY(0, 0);
-            cursorPosition.Current.Some(coord => baseCoord = coord);
-
-            var x = inputs.RightKeyPressed ? 1 : 0;
-            x += inputs.LeftKeyPressed ? -1 : 0;
-
-            var y = inputs.UpKeyPressed ? 1 : 0;
-            y += inputs.DownKeyPressed ? -1 : 0;
-
-            if(x != 0 || y != 0)
-            {
-                var selectedCoord = baseCoord.Move(x, y);
-
-                if(!limits.IsInside(selectedCoord))
-                    return;
-
-                cursorPosition.Set(selectedCoord);
-            }
-
-            if(inputs.SpaceKeyPressed)
-            {
-                cursorPosition.Current.Some(coord => {
-                    itemSelection.Set(coord, grid.GetValue(coord));
-                });
             }
         }
     }

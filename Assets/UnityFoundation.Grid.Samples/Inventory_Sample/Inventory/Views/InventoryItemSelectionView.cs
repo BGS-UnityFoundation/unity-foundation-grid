@@ -26,12 +26,9 @@ namespace UnityFoundation.Grid.Samples
         public void Setup(InventoryItemSelection selection)
         {
             selection.OnValueChanged += HandleInventoryItemChanged;
-            HandleInventoryItemChanged(selection.Current);
         }
 
-        private void HandleInventoryItemChanged(
-            Optional<SelectedValue<XY, InventoryItem>> currentItem
-        )
+        private void HandleInventoryItemChanged(Optional<InventoryItemSelected> currentItem)
         {
             currentItem
                 .Some(item => {
@@ -39,6 +36,11 @@ namespace UnityFoundation.Grid.Samples
                     Text.text = item.Value.Name;
                 })
                 .OrElse(() => Text.text = "");
+        }
+
+        public void Display()
+        {
+            Text.text = "";
         }
     }
 }

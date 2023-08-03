@@ -18,5 +18,11 @@ namespace UnityFoundation.Grid.Samples
             Current = Optional<T>.Some(value);
             OnValueChanged?.Invoke(Current);
         }
+
+        public void Clear()
+        {
+            Current = Optional<T>.None();
+            OnValueChanged?.Invoke(Current);
+        }
     }
 }

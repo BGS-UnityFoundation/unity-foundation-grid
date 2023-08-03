@@ -608,6 +608,8 @@ MonoBehaviour:
     type: 3}
   selectedFramePrefab: {fileID: 6848824079308240624, guid: ca4599d4cc5758c49b68a76e295886bb,
     type: 3}
+  cursorPrefab: {fileID: 6848824079308240624, guid: a55cc75af33546d4c949e3f194420996,
+    type: 3}
 --- !u!114 &1300717953
 MonoBehaviour:
   m_ObjectHideFlags: 0

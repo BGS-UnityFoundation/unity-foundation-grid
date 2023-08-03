@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityFoundation.Code;
 using UnityFoundation.Code.UnityAdapter;
@@ -12,10 +11,6 @@ namespace UnityFoundation.Grid.Samples
         [SerializeField] private GameObject selectedFramePrefab;
         [SerializeField] private GameObject cursorPrefab;
 
-        private InventoryItemSelection itemSelection;
-        private XYSelection cursorPosition;
-
-        private GridXY<InventoryItem> grid;
         private GridLimitXY limits;
 
         private Vector2 sizeDelta;
@@ -25,24 +20,17 @@ namespace UnityFoundation.Grid.Samples
         private GameObject selectedMark;
 
         public void Setup(
-            GridXY<InventoryItem> grid,
             GridLimitXY limits,
-            XYSelection cursorPosition,
+            InventoryCursorSelection cursorPosition,
             InventoryItemSelection itemSelection
         )
         {
-            this.grid = grid;
             this.limits = limits;
 
-            this.cursorPosition = cursorPosition;
             cursorPosition.OnValueChanged += HandleCursorPositionChange;
-
-            this.itemSelection = itemSelection;
             itemSelection.OnValueChanged += UpdateSelectedItemView;
 
             sizeDelta = GetComponent<RectTransform>().sizeDelta;
-
-            Display();
         }
 
         private void HandleCursorPositionChange(Optional<XY> cursorPosition)
@@ -50,7 +38,7 @@ namespace UnityFoundation.Grid.Samples
             cursorPosition.Some(coord => UpdateCursorView(coord));
         }
 
-        private void Display()
+        public void Display()
         {
             cellSize = new Vector2(
                 sizeDelta.x / limits.Width,
@@ -60,12 +48,12 @@ namespace UnityFoundation.Grid.Samples
             foreach(var coord in limits.GetAllCoordinates())
                 InstantiateItem(coord);
 
-            HandleCursorPositionChange(cursorPosition.Current);
+            UpdateCursorView(new(0, 0));
         }
 
-        private void UpdateSelectedItemView(Optional<SelectedValue<XY, InventoryItem>> selectedItem)
+        private void UpdateSelectedItemView(Optional<InventoryItemSelected> selectedItem)
         {
-            selectedItem.Some(i => InstantiateSelectedFrame(i.Key));
+            selectedItem.Some(i => InstantiateSelectedFrame(i.Coord));
         }
 
         private void UpdateCursorView(XY coord)

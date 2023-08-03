@@ -5,26 +5,33 @@ namespace UnityFoundation.Grid.Samples
 {
     public class GridXYDebugView
     {
+        private readonly InventoryGrid grid;
+        private readonly GridLimitXY limits;
         private Vector2 cellSize;
 
-        public void Display<T>(GridXY<T> grid, GridLimitXY limits, RectTransform parent)
-            where T : new()
+        public GridXYDebugView(InventoryGrid grid, GridLimitXY limits)
+        {
+            this.grid = grid;
+            this.limits = limits;
+        }
+
+        public void Display(RectTransform parent)
         {
             cellSize = new Vector2(
-                parent.sizeDelta.x / limits.Width, 
+                parent.sizeDelta.x / limits.Width,
                 parent.sizeDelta.y / limits.Height
             );
 
-            var debugGrid = new GridXYDebug<T>(limits);
+            var debugGrid = new GridXYDebug<InventoryItem>(limits);
 
             foreach(var coord in limits.GetAllCoordinates())
             {
                 debugGrid.SetValue(
                     coord,
-                    new GridDebugValue<T>(
-                        grid.GetValue(coord), 
-                        parent, 
-                        ConvertToScreenPosition(coord), 
+                    new GridDebugValue<InventoryItem>(
+                        grid.GetValue(coord),
+                        parent,
+                        ConvertToScreenPosition(coord),
                         cellSize
                     )
                 );

@@ -2,5 +2,5 @@
 
 namespace UnityFoundation.Grid.Samples
 {
-    public class XYSelection : GenericSelection<XY> { }
+    public class InventoryCursorSelection : GenericSelection<XY> { }
 }
