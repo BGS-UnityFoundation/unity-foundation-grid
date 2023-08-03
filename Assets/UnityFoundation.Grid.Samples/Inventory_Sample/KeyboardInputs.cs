@@ -8,6 +8,7 @@ namespace UnityFoundation.Grid.Samples
         public bool DownKeyPressed { get; private set; }
         public bool LeftKeyPressed { get; private set; }
         public bool RightKeyPressed { get; private set; }
+        public bool SpaceKeyPressed { get; private set; }
 
         public void Update()
         {
@@ -15,6 +16,7 @@ namespace UnityFoundation.Grid.Samples
             DownKeyPressed = Keyboard.current.downArrowKey.wasPressedThisFrame;
             LeftKeyPressed = Keyboard.current.leftArrowKey.wasPressedThisFrame;
             RightKeyPressed = Keyboard.current.rightArrowKey.wasPressedThisFrame;
+            SpaceKeyPressed = Keyboard.current.spaceKey.wasPressedThisFrame;
         }
     }
 }

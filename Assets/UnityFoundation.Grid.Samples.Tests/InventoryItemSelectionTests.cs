@@ -10,7 +10,7 @@ namespace UnityFoundation.Grid.Samples.Tests
         public void Should_have_no_selected_item_when_not_selected()
         {
             var selection = new InventoryItemSelection();
-            Assert.That(selection.CurrentItem.IsPresent, Is.False);
+            Assert.That(selection.Current.IsPresent, Is.False);
         }
 
         [Test]
@@ -21,14 +21,14 @@ namespace UnityFoundation.Grid.Samples.Tests
             var selectedCoord = new XY(0, 0);
 
             var changedEvent = new EventTest<Optional<SelectedValue<XY, InventoryItem>>>(
-                selection, nameof(selection.OnInventoryItemChanged)
+                selection, nameof(selection.OnValueChanged)
             );
 
             selection.Set(selectedCoord, item);
 
-            Assert.That(selection.CurrentItem.IsPresent, Is.True);
-            Assert.That(selection.CurrentItem.Get().Key, Is.EqualTo(selectedCoord));
-            Assert.That(selection.CurrentItem.Get().Value, Is.EqualTo(item));
+            Assert.That(selection.Current.IsPresent, Is.True);
+            Assert.That(selection.Current.Get().Key, Is.EqualTo(selectedCoord));
+            Assert.That(selection.Current.Get().Value, Is.EqualTo(item));
             Assert.That(changedEvent.WasTriggered, Is.True);
         }
     }

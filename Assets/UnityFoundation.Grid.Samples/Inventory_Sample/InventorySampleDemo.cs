@@ -12,15 +12,19 @@ namespace UnityFoundation.Grid.Samples
         [SerializeField] InventoryView inventoryView;
         [SerializeField] RectTransform debugPanel;
 
+        XYSelection cursorPosition;
         InventoryItemSelection itemSelection;
-        private GridLimitXY limits;
+
         KeyboardInputs inputs;
+
+        private GridLimitXY limits;
         private GridXY<InventoryItem> grid;
 
         public void Start()
         {
             inputs = new KeyboardInputs();
             itemSelection = new InventoryItemSelection();
+            cursorPosition = new XYSelection();
 
             this.limits = new GridLimitXY(width, height);
             this.grid = new GridXY<InventoryItem>(limits);
@@ -36,10 +40,10 @@ namespace UnityFoundation.Grid.Samples
                 );
             }
             var initialCoord = new XY(0, 0);
-            itemSelection.Set(initialCoord, grid.GetValue(initialCoord));
+            cursorPosition.Set(initialCoord);
 
             selectionView.Setup(itemSelection);
-            inventoryView.Setup(grid, limits, itemSelection);
+            inventoryView.Setup(grid, limits, cursorPosition, itemSelection);
             new GridXYDebugView().Display(grid, limits, debugPanel);
         }
 
@@ -48,7 +52,7 @@ namespace UnityFoundation.Grid.Samples
             inputs.Update();
 
             var baseCoord = new XY(0, 0);
-            itemSelection.CurrentItem.Some(item => baseCoord = item.Key);
+            cursorPosition.Current.Some(coord => baseCoord = coord);
 
             var x = inputs.RightKeyPressed ? 1 : 0;
             x += inputs.LeftKeyPressed ? -1 : 0;
@@ -63,7 +67,14 @@ namespace UnityFoundation.Grid.Samples
                 if(!limits.IsInside(selectedCoord))
                     return;
 
-                itemSelection.Set(selectedCoord, grid.GetValue(selectedCoord));
+                cursorPosition.Set(selectedCoord);
+            }
+
+            if(inputs.SpaceKeyPressed)
+            {
+                cursorPosition.Current.Some(coord => {
+                    itemSelection.Set(coord, grid.GetValue(coord));
+                });
             }
         }
     }

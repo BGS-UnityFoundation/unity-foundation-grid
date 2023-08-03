@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityFoundation.Code;
 using UnityFoundation.Code.UnityAdapter;
-using static UnityEditor.Progress;
 
 namespace UnityFoundation.Grid.Samples
 {
@@ -10,7 +10,10 @@ namespace UnityFoundation.Grid.Samples
     {
         [SerializeField] private GameObject itemPrefab;
         [SerializeField] private GameObject selectedFramePrefab;
+        [SerializeField] private GameObject cursorPrefab;
+
         private InventoryItemSelection itemSelection;
+        private XYSelection cursorPosition;
 
         private GridXY<InventoryItem> grid;
         private GridLimitXY limits;
@@ -18,22 +21,33 @@ namespace UnityFoundation.Grid.Samples
         private Vector2 sizeDelta;
         private Vector2 cellSize;
 
+        private GameObject cursorView;
         private GameObject selectedMark;
 
         public void Setup(
             GridXY<InventoryItem> grid,
             GridLimitXY limits,
+            XYSelection cursorPosition,
             InventoryItemSelection itemSelection
         )
         {
             this.grid = grid;
             this.limits = limits;
+
+            this.cursorPosition = cursorPosition;
+            cursorPosition.OnValueChanged += HandleCursorPositionChange;
+
             this.itemSelection = itemSelection;
-            itemSelection.OnInventoryItemChanged += UpdateSelectedItemView;
+            itemSelection.OnValueChanged += UpdateSelectedItemView;
 
             sizeDelta = GetComponent<RectTransform>().sizeDelta;
 
             Display();
+        }
+
+        private void HandleCursorPositionChange(Optional<XY> cursorPosition)
+        {
+            cursorPosition.Some(coord => UpdateCursorView(coord));
         }
 
         private void Display()
@@ -46,12 +60,22 @@ namespace UnityFoundation.Grid.Samples
             foreach(var coord in limits.GetAllCoordinates())
                 InstantiateItem(coord);
 
-            UpdateSelectedItemView(itemSelection.CurrentItem);
+            HandleCursorPositionChange(cursorPosition.Current);
         }
 
         private void UpdateSelectedItemView(Optional<SelectedValue<XY, InventoryItem>> selectedItem)
         {
             selectedItem.Some(i => InstantiateSelectedFrame(i.Key));
+        }
+
+        private void UpdateCursorView(XY coord)
+        {
+            if(cursorView == null)
+                cursorView = Instantiate(cursorPrefab, transform);
+
+            var rect = cursorView.GetComponent<RectTransform>();
+            SetCellSize(rect);
+            UpdatePosition(coord, rect);
         }
 
         private void InstantiateSelectedFrame(XY coord)

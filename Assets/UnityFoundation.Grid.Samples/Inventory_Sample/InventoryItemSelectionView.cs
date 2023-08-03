@@ -6,20 +6,27 @@ namespace UnityFoundation.Grid.Samples
 {
     public class InventoryItemSelectionView : MonoBehaviour
     {
-        private InventoryItemSelection selection;
         private TextMeshProUGUI text;
+
+        public TextMeshProUGUI Text {
+            get {
+                if(text == null)
+                    text = transform.FindComponent<TextMeshProUGUI>("item");
+
+                return text;
+            }
+            set => text = value;
+        }
 
         public void Start()
         {
-            text = transform.FindComponent<TextMeshProUGUI>("item");
+            Text = transform.FindComponent<TextMeshProUGUI>("item");
         }
 
         public void Setup(InventoryItemSelection selection)
         {
-            this.selection = selection;
-
-            selection.OnInventoryItemChanged += HandleInventoryItemChanged;
-            HandleInventoryItemChanged(selection.CurrentItem);
+            selection.OnValueChanged += HandleInventoryItemChanged;
+            HandleInventoryItemChanged(selection.Current);
         }
 
         private void HandleInventoryItemChanged(
@@ -27,8 +34,11 @@ namespace UnityFoundation.Grid.Samples
         )
         {
             currentItem
-                .Some(item => text.text = item.Value.Name)
-                .OrElse(() => text.text = "");
+                .Some(item => {
+                    Debug.Log(item.Value);
+                    Text.text = item.Value.Name;
+                })
+                .OrElse(() => Text.text = "");
         }
     }
 }
