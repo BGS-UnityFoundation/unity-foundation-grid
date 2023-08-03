@@ -29,8 +29,6 @@ namespace UnityFoundation.Grid.Samples
             binder.Register<MoveCursorCommand>();
             binder.Register<SelectedItemCommand>();
 
-            binder.Register<GridXYDebugView>();
-
             container = binder.Build();
 
             FillInventoryGrid();
@@ -46,8 +44,6 @@ namespace UnityFoundation.Grid.Samples
 
             container.Resolve<InventoryView>().Display();
             container.Resolve<InventoryItemSelectionView>().Display();
-
-            container.Resolve<GridXYDebugView>().Display(debugPanel);
         }
 
         private void FillInventoryGrid()

@@ -5,12 +5,18 @@ using UnityFoundation.Code.UnityAdapter;
 
 namespace UnityFoundation.Grid.Samples
 {
+    public class InventoryCell
+    {
+        public GameObject Obj { get; set; }
+    }
+
     public class InventoryView : MonoBehaviour
     {
         [SerializeField] private GameObject itemPrefab;
         [SerializeField] private GameObject selectedFramePrefab;
         [SerializeField] private GameObject cursorPrefab;
 
+        private GridXY<InventoryCell> gridView;
         private GridLimitXY limits;
 
         private Vector2 sizeDelta;
@@ -26,6 +32,7 @@ namespace UnityFoundation.Grid.Samples
         )
         {
             this.limits = limits;
+            gridView = new(limits);
 
             cursorPosition.OnValueChanged += HandleCursorPositionChange;
             itemSelection.OnValueChanged += UpdateSelectedItemView;
@@ -53,7 +60,10 @@ namespace UnityFoundation.Grid.Samples
 
         private void UpdateSelectedItemView(Optional<InventoryItemSelected> selectedItem)
         {
-            selectedItem.Some(i => InstantiateSelectedFrame(i.Coord));
+            selectedItem.Some(i => InstantiateSelectedFrame(i.Coord))
+                .OrElse(() => {
+                    selectedMark.SetActive(false);
+                });
         }
 
         private void UpdateCursorView(XY coord)
@@ -61,9 +71,7 @@ namespace UnityFoundation.Grid.Samples
             if(cursorView == null)
                 cursorView = Instantiate(cursorPrefab, transform);
 
-            var rect = cursorView.GetComponent<RectTransform>();
-            SetCellSize(rect);
-            UpdatePosition(coord, rect);
+            UpdateCell(cursorView, coord);
         }
 
         private void InstantiateSelectedFrame(XY coord)
@@ -71,21 +79,26 @@ namespace UnityFoundation.Grid.Samples
             if(selectedMark == null)
                 selectedMark = Instantiate(selectedFramePrefab, transform);
 
-            var rect = selectedMark.GetComponent<RectTransform>();
-            SetCellSize(rect);
-            UpdatePosition(coord, rect);
+            selectedMark.SetActive(true);
+            UpdateCell(selectedMark, coord);
         }
 
         private void InstantiateItem(XY coord)
         {
             var item = Instantiate(itemPrefab, transform);
-
-            var rect = item.GetComponent<RectTransform>();
-            SetCellSize(rect);
-            UpdatePosition(coord, rect);
+            UpdateCell(item, coord);
 
             var image = item.GetComponent<Image>();
             image.color = ColorGenerator.Random();
+
+            gridView.UpdateValue(coord, c => c.Obj = item);
+        }
+
+        private void UpdateCell(GameObject obj, XY coord)
+        {
+            var rect = obj.GetComponent<RectTransform>();
+            SetCellSize(rect);
+            UpdatePosition(coord, rect);
         }
 
         private void SetCellSize(RectTransform rect)
@@ -104,6 +117,20 @@ namespace UnityFoundation.Grid.Samples
                 coord.X * cellSize.x,
                 coord.Y * cellSize.y
             );
+        }
+
+        public void ChangeCells(XY first, XY second)
+        {
+            var firstCell = gridView.GetValue(first);
+            var secondCell = gridView.GetValue(second);
+
+            gridView.Clear(second);
+            gridView.SetValue(second, firstCell);
+            UpdateCell(firstCell.Obj, second);
+
+            gridView.Clear(first);
+            gridView.SetValue(first, secondCell);
+            UpdateCell(secondCell.Obj, first);
         }
     }
 }

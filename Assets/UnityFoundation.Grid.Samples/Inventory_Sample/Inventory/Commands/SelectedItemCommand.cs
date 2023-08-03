@@ -8,18 +8,21 @@ namespace UnityFoundation.Grid.Samples
         private readonly InventoryCursorSelection cursorPosition;
         private readonly InventoryItemSelection itemSelection;
         private readonly InventoryGrid grid;
+        private readonly InventoryView gridView;
 
         public SelectedItemCommand(
             KeyboardInputs inputs,
             InventoryCursorSelection cursorPosition,
             InventoryItemSelection itemSelection,
-            InventoryGrid grid
+            InventoryGrid grid,
+            InventoryView gridView
         )
         {
             this.inputs = inputs;
             this.cursorPosition = cursorPosition;
             this.itemSelection = itemSelection;
             this.grid = grid;
+            this.gridView = gridView;
         }
 
         public void Execute()
@@ -39,8 +42,14 @@ namespace UnityFoundation.Grid.Samples
 
             var selectedItem = grid.GetValue(item.Coord);
 
+            grid.Clear(cursorCoord);
             grid.SetValue(cursorCoord, selectedItem);
+
+            grid.Clear(item.Coord);
             grid.SetValue(item.Coord, cursorItem);
+
+            gridView.ChangeCells(cursorCoord, item.Coord);
+
             itemSelection.Clear();
         }
     }
