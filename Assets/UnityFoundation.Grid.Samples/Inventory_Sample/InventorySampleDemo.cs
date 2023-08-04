@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityFoundation.Code;
+using UnityFoundation.Code.UnityAdapter;
 
 namespace UnityFoundation.Grid.Samples
 {
@@ -16,20 +17,7 @@ namespace UnityFoundation.Grid.Samples
 
         public void Start()
         {
-            var binder = new DependencyBinder();
-            binder.RegisterSingleton<KeyboardInputs, KeyboardInputs>();
-            binder.RegisterSingleton<InventoryItemSelection, InventoryItemSelection>();
-            binder.RegisterSingleton<InventoryCursorSelection, InventoryCursorSelection>();
-            binder.Register(new GridLimitXY(width, height));
-            binder.RegisterSingleton<InventoryGrid, InventoryGrid>();
-            binder.RegisterSetup(selectionView);
-            binder.RegisterSetup(inventoryView);
-
-            binder.Register<InventoryCommands>();
-            binder.Register<MoveCursorCommand>();
-            binder.Register<SelectedItemCommand>();
-
-            container = binder.Build();
+            Bind();
 
             FillInventoryGrid();
             container.Resolve<InventoryCursorSelection>().Set(new(0, 0));
@@ -46,21 +34,42 @@ namespace UnityFoundation.Grid.Samples
             container.Resolve<InventoryItemSelectionView>().Display();
         }
 
+        private void Bind()
+        {
+            var binder = new DependencyBinder();
+            binder.RegisterSingleton<KeyboardInputs, KeyboardInputs>();
+            binder.RegisterSingleton<InventoryItemSelection, InventoryItemSelection>();
+            binder.RegisterSingleton<InventoryCursorSelection, InventoryCursorSelection>();
+            binder.Register(new GridLimitXY(width, height));
+            binder.RegisterSingleton<InventoryGrid, InventoryGrid>();
+            binder.RegisterSetup(selectionView);
+            binder.RegisterSetup(inventoryView);
+
+            binder.Register<InventoryCommands>();
+            binder.Register<MoveCursorCommand>();
+            binder.Register<SelectedItemCommand>();
+
+            container = binder.Build();
+        }
+
         private void FillInventoryGrid()
         {
-            var limits = container.Resolve<GridLimitXY>();
             var grid = container.Resolve<InventoryGrid>();
 
-            var index = 0;
-            foreach(var coord in limits.GetAllCoordinates())
-            {
-                grid.SetValue(
-                    coord,
-                    new InventoryItem() {
-                        Name = $"Item {index++}"
-                    }
-                );
-            }
+            grid.SetValue(
+                new(0, 0),
+                new InventoryItem() { Name = $"Item 0", Color = ColorGenerator.Random() }
+            );
+
+            grid.SetValue(
+                new(2, 3),
+                new InventoryItem() { Name = $"Item 1", Color = ColorGenerator.Random() }
+            );
+
+            grid.SetValue(
+                new(1, 1),
+                new InventoryItem() { Name = $"Item 2", Color = ColorGenerator.Random() }
+            );
         }
     }
 }

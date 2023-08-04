@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 using UnityFoundation.Code;
 using UnityFoundation.Code.UnityAdapter;
@@ -18,7 +19,7 @@ namespace UnityFoundation.Grid.Samples
 
         private GridXY<InventoryCell> gridView;
         private GridLimitXY limits;
-
+        private InventoryGrid inventoryGrid;
         private Vector2 sizeDelta;
         private Vector2 cellSize;
 
@@ -27,11 +28,13 @@ namespace UnityFoundation.Grid.Samples
 
         public void Setup(
             GridLimitXY limits,
+            InventoryGrid inventoryGrid,
             InventoryCursorSelection cursorPosition,
             InventoryItemSelection itemSelection
         )
         {
             this.limits = limits;
+            this.inventoryGrid = inventoryGrid;
             gridView = new(limits);
 
             cursorPosition.OnValueChanged += HandleCursorPositionChange;
@@ -88,8 +91,18 @@ namespace UnityFoundation.Grid.Samples
             var item = Instantiate(itemPrefab, transform);
             UpdateCell(item, coord);
 
-            var image = item.GetComponent<Image>();
-            image.color = ColorGenerator.Random();
+            var inventoryItem = inventoryGrid.GetValue(coord);
+
+            if(inventoryItem.Name != null)
+            {
+                item.GetComponent<Image>().color = inventoryItem.Color;
+                item.transform.FindComponent<TextMeshProUGUI>("name").text = inventoryItem.Name;
+            }
+            else
+            {
+                item.GetComponent<Image>().color = Color.gray;
+                item.transform.FindComponent<TextMeshProUGUI>("name").text = "";
+            }
 
             gridView.UpdateValue(coord, c => c.Obj = item);
         }
