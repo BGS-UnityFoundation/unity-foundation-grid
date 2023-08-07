@@ -4,6 +4,7 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "UnityFoundation.Grid",
         "UnityFoundation.Grid.Samples",
         "UnityFoundation.Code",
         "UnityFoundation.TestUtility",

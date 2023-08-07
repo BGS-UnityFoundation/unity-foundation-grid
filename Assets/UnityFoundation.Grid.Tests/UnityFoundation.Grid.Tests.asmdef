@@ -2,25 +2,19 @@
     "name": "UnityFoundation.Grid.Tests",
     "rootNamespace": "UnityFoundation.Grid.Tests",
     "references": [
-        
+        "GUID:5e2fc1bdd2f7f0a4584c61b84a1e9c8f",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:dc04f38471c3a459fb4d31124ee9127d"
     ],
     "includePlatforms": [
         "Editor"
     ],
-    "excludePlatforms": [
-        
-    ],
+    "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [
-        
-    ],
+    "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [
-        
-    ],
-    "versionDefines": [
-        
-    ],
+    "defineConstraints": [],
+    "versionDefines": [],
     "noEngineReferences": false
 }
